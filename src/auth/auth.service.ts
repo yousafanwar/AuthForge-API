@@ -1,15 +1,25 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-// import { UserService } from 'src/user/user.service';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class AuthService {
-    constructor(readonly jwtService: JwtService) { }
+    constructor(
+        readonly jwtService: JwtService,
+        readonly userService: UserService
+    ) { }
 
-    async signToken(userId: string, email: string) {
+    async signToken(email: string, password: string) {
+
+        const user = await this.userService.validateUser(email, password);
+
+        if (!user) {
+            throw new NotFoundException('User with this email was not found');
+        }
+
         const payload = {
-            sub: userId,
-            email
+            sub: user.id,
+            email: user.email
         }
 
         return this.jwtService.signAsync(payload);

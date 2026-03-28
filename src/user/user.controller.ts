@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Body, UnauthorizedException } from '@nestjs/common';
+import { Controller, Post, Get, Body } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './user.dto';
 
@@ -18,17 +18,4 @@ export class UserController {
         return this.userService.findAll();
     }
 
-    @Post('login')
-    async login(@Body() dto: CreateUserDto) {
-        const user = await this.userService.validateUser(
-            dto.email,
-            dto.password,
-        );
-
-        if (!user) {
-            throw new UnauthorizedException('Invalid credentials');
-        }
-
-        return user;
-    }
 }
