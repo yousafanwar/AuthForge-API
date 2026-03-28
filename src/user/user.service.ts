@@ -1,10 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
+import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class UserService {
-    constructor(readonly prisma: PrismaService) { }
+    constructor(
+        readonly prisma: PrismaService, 
+        readonly authService: AuthService
+    ) { }
 
     async createUser(email: string, password: string) {
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -23,15 +27,19 @@ export class UserService {
         return this.prisma.user.findMany();
     }
 
-    async validateUser(email: string, password: string) {
+    async validateUser(email: string, plainPassword: string) {
         const user = await this.findByEmail(email);
 
         if (!user) return null;
 
-        const isMatch = await bcrypt.compare(password, user.password);
+        const isMatch = await bcrypt.compare(plainPassword, user.password);
 
         if (!isMatch) return null;
 
-        return user;
+        const { password, hashedRt, ...result } = user;
+
+        const token = this.authService.signToken(result.id, result.email);
+
+        return token;
     }
 }
