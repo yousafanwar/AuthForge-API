@@ -79,10 +79,13 @@ export class AuthService {
         }
 
         const tokens = await this.getTokens(payload);
-        
-        await this.updateRefreshToken(user.id, tokens.refreshToken)
-        
-        return tokens;
 
+        await this.updateRefreshToken(user.id, tokens.refreshToken)
+
+        return tokens;
+    }
+
+    async removeRtFromDb(userId: string) {
+        await this.prismaService.user.update({ where: { id: userId }, data: { hashedRt: null } });
     }
 }
