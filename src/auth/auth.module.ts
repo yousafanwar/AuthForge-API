@@ -4,17 +4,17 @@ import { AuthController } from './auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { UserModule } from 'src/user/user.module';
 import { JWTStrategy } from './strategies/jwt.strategy';
-import { JwtGuard } from './Guards/jwt.guards';
+import { PrismaModule } from 'src/prisma/prisma.module';
 
 @Module({
   imports: [
     JwtModule.register({
-      secret: 'secret-key',
-      signOptions: { expiresIn: '15min' }
+      secret: 'secret-key'
     }),
-    UserModule
+    UserModule, 
+    PrismaModule
   ],
-  providers: [AuthService, JWTStrategy, JwtGuard],
+  providers: [AuthService, JWTStrategy],
   controllers: [AuthController],
   exports: [AuthService],
 })
