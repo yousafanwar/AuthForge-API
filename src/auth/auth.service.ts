@@ -55,7 +55,8 @@ export class AuthService {
 
         const newPayload = {
             sub: user.id,
-            email: user.email
+            email: user.email,
+            role: user.role
         };
 
         const tokens = await this.getTokens(newPayload);
@@ -75,7 +76,8 @@ export class AuthService {
 
         const payload = {
             sub: user.id,
-            email: user.email
+            email: user.email,
+            role: user.role
         }
 
         const tokens = await this.getTokens(payload);
