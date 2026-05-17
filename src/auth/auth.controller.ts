@@ -1,12 +1,15 @@
 import { Body, Controller, UnauthorizedException, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiCookieAuth } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '../user/user.dto';
 import { JwtGuard } from './guards/jwt.guards';
 
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
     constructor(readonly authService: AuthService) { }
 
+    @ApiOperation({ summary: 'Login user' })
     @Post('login')
     async login(@Body() body: CreateUserDto, @Res({ passthrough: true }) res) {
 
@@ -21,6 +24,8 @@ export class AuthController {
         return { 'Access token': token.accessToken }
     }
 
+    @ApiCookieAuth('refresh-token')
+    @ApiOperation({ summary: 'Refresh access token using refresh-token cookie' })
     @Post('refresh')
     async getNewTokens(@Req() req) {
 
@@ -31,6 +36,8 @@ export class AuthController {
         return this.authService.verifyRefreshToken(rt);
     }
 
+    @ApiBearerAuth()
+    @ApiOperation({ summary: 'Logout user and clear refresh-token cookie' })
     @Post('logout')
     @UseGuards(JwtGuard)
     async logout(@Req() req, @Res({ passthrough: true }) res) {
